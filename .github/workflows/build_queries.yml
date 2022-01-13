@@ -33,7 +33,7 @@ jobs:
           fi;
       - name: Build Queries
         run: |
-          (cd src/scripts && ./compile_scripts.sh
+          (cd src/scripts && ./compile_scripts.sh)
           (cd src/scripts/bin/linux/ && ./concat)
           (cd src/scripts/bin/linux/ && zip -Z bzip2 public-db.mysql.zip public-db.sql
           mv src/scripts/bin/linux/public-db.mysql.zip build_artifacts
