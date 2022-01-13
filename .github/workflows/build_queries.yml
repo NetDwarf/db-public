@@ -1,0 +1,44 @@
+name: Build SQL queries
+concurrency:
+  group: build_queries
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build_queries:
+    name: Build and Release SQL Queries 
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Build Environment
+        run: |
+          sudo apt update && sudo apt install -y --no-install-recommends golang-1.13
+          mkdir build_artifacts
+      - name: Generate Release Info
+        run: |
+          last_build_number=$(git tag -l --sort=creatordate | grep -E '^[0-9]+$' | tail -n1);
+          
+          if [ -n "$last_build_number" ]; \
+          then git log origin/master --first-parent  --format="%s%n%w(0,4,4)%b" "$last_build_number".. | grep -v "^$" > patch_notes.txt; \
+          sed -i '1s/^/```\n/' patch_notes.txt; \
+          new_build_number=$((1+$last_build_number)); \
+          else new_build_number=1; printf '```\nInitial Release' > patch_notes.txt; \
+          fi;
+      - name: Build Queries
+        run: |
+          (cd src/scripts && ./compile_scripts.sh
+          (cd src/scripts/bin/linux/ && ./concat)
+          (cd src/scripts/bin/linux/ && zip -Z bzip2 public-db.mysql.zip public-db.sql
+          mv src/scripts/bin/linux/public-db.mysql.zip build_artifacts
+      - name: Create Release
+        run: |
+          gh release create "$new_build_number" --title "Build $new_build_number" -F release_info/patch_notes.txt build_artifacts/*
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
