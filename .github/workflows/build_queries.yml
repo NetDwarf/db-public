@@ -31,6 +31,7 @@ jobs:
           new_build_number=$((1+$last_build_number)); \
           else new_build_number=1; printf '```\nInitial Release' > patch_notes.txt; \
           fi;
+          echo "new_build_number=$new_build_number" >> $GITHUB_ENV
       - name: Build Queries
         run: |
           (cd src/scripts/config && mv config.example.yml config.yml)
@@ -41,6 +42,6 @@ jobs:
           mv src/scripts/bin/linux/public-db.mysql.zip build_artifacts
       - name: Create Release
         run: |
-          gh release create "$new_build_number" --title "Build $new_build_number" -F release_info/patch_notes.txt build_artifacts/*
+          gh release create "${{ env.new_build_number }}" --title "Build ${{ env.new_build_number }}" -F patch_notes.txt build_artifacts/*
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
