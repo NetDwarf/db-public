@@ -18,9 +18,9 @@ jobs:
         with:
           fetch-depth: 0
       - name: Setup Build Environment
-        run: |
-          sudo apt update && sudo apt install -y --no-install-recommends golang-1.13
-          mkdir build_artifacts
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.13'
       - name: Generate Release Info
         run: |
           last_build_number=$(git tag -l --sort=creatordate | grep -E '^[0-9]+$' | tail -n1);
@@ -33,9 +33,11 @@ jobs:
           fi;
       - name: Build Queries
         run: |
+          (cd src/scripts/config && mv config.example.yml config.yml)
           (cd src/scripts && ./compile_scripts.sh)
           (cd src/scripts/bin/linux/ && ./concat)
-          (cd src/scripts/bin/linux/ && zip -Z bzip2 public-db.mysql.zip public-db.sql
+          (cd src/scripts/bin/linux/ && zip -Z bzip2 public-db.mysql.zip public-db.sql)
+          mkdir build_artifacts
           mv src/scripts/bin/linux/public-db.mysql.zip build_artifacts
       - name: Create Release
         run: |
