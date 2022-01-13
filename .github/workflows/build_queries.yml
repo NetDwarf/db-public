@@ -36,10 +36,11 @@ jobs:
         run: |
           (cd src/scripts/config && mv config.example.yml config.yml)
           (cd src/scripts && ./compile_scripts.sh)
-          (cd src/scripts/bin/linux/ && ./concat)
-          (cd src/scripts/bin/linux/ && zip -Z bzip2 public-db.mysql.zip public-db.sql)
           mkdir build_artifacts
-          mv src/scripts/bin/linux/public-db.mysql.zip build_artifacts
+          (cd src/scripts/bin/linux/ && \
+          ./concat && zip -Z bzip2 public-db.mysql.zip public-db.sql && rm public-db.sql && \
+          ./concat -sqlite && zip -Z bzip2 public-db.sqlite.zip public-db.sql && \
+          mv public-db.mysql.zip public-db.sqlite.zip ../../../../build_artifacts)
       - name: Create Release
         run: |
           gh release create "${{ env.new_build_number }}" --title "Build ${{ env.new_build_number }}" -F patch_notes.txt build_artifacts/*
