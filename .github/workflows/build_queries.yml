@@ -56,7 +56,7 @@ jobs:
 
           for file in customizations/*.sql; do \
           echo "Testing [$file]"; \
-          echo "START TRANSACTION;$(cat $file);ROLLBACK;" | mysql -u root --password=root -h 127.0.0.1 -P 3307 -D dol; \
+          echo "START TRANSACTION;$(cat $file);ROLLBACK;" | mysql -u root --password=root -h 127.0.0.1 -P 3306 -D dol; \
           done
       - name: Compress DB
         if: ${{ github.event_name == 'push' }}
