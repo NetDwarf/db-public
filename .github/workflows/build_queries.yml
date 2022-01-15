@@ -11,16 +11,11 @@ jobs:
   build_db:
     name: Build, Test, and Release DB
     runs-on: ubuntu-20.04
-    env:
-      DB_DATABASE: dol
-      DB_USER: root
-      DB_PASSWORD: 'root'
-      DB_HOST: localhost
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          fetch-depth: 50
+          fetch-depth: 0
       - name: Setup Build Environment
         uses: actions/setup-go@v2
         with:
@@ -48,11 +43,16 @@ jobs:
       - name: Test SQLite
         run: sqlite3 test.db < public-db.sqlite.sql
       - name: Test MySQL
+        env:
+          DB_DATABASE: dol
+          DB_USER: root
+          DB_PASSWORD: 'root'
+          DB_HOST: localhost
         run: |
           sudo /etc/init.d/mysql start
           mysql -e 'CREATE DATABASE dol;' -uroot -proot
           mysql -e 'SHOW DATABASES;' -uroot -proot
-          cat public-db.sql | mysql -h 127.0.0.1 -u root -P 3306 --password=root -D dol
+          cat public-db.mysql.sql | mysql -h 127.0.0.1 -u root -P 3306 --password=root -D dol
       - name: Compress Queries
         if: ${{ github.event_name == 'push' }}
         run: |
