@@ -1,4 +1,4 @@
-name: Build SQL queries
+name: Build DB
 
 on:
   push:
@@ -8,14 +8,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_queries:
-    name: Build, Test, and Release SQL Queries 
+  build_db:
+    name: Build, Test, and Release DB
     runs-on: ubuntu-20.04
+    env:
+      DB_DATABASE: dol
+      DB_USER: root
+      DB_PASSWORD: 'root'
+      DB_HOST: localhost
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 50
       - name: Setup Build Environment
         uses: actions/setup-go@v2
         with:
@@ -40,8 +45,14 @@ jobs:
           mv public-db.sql public-db.mysql.sql
           go run concat.go -sqlite
           mv public-db.sql public-db.sqlite.sql
-      - name: Test SQLite query
+      - name: Test SQLite
         run: sqlite3 test.db < public-db.sqlite.sql
+      - name: Test MySQL
+        run: |
+          sudo /etc/init.d/mysql start
+          mysql -e 'CREATE DATABASE dol;' -uroot -proot
+          mysql -e 'SHOW DATABASES;' -uroot -proot
+          cat public-db.sql | mysql -h 127.0.0.1 -u root -P 3306 --password=root -D dol
       - name: Compress Queries
         if: ${{ github.event_name == 'push' }}
         run: |
