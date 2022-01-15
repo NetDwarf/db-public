@@ -53,6 +53,11 @@ jobs:
           mysql -e 'CREATE DATABASE dol;' -uroot -proot
           cat public-db.mysql.sql | mysql -h 127.0.0.1 -u root -P 3306 --password=root -D dol
           mysql -e 'USE dol; SHOW TABLES;' -uroot -proot
+
+          for file in customizations/*.sql; do \
+          echo "Testing [$file]"; \
+          echo "START TRANSACTION;$(cat $file);ROLLBACK;" | mysql -u root --password=root -h 127.0.0.1 -P 3307 -D dol; \
+          done
       - name: Compress DB
         if: ${{ github.event_name == 'push' }}
         run: |
