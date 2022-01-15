@@ -20,8 +20,6 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: '1.13'
-      - name: Install necessary packages
-        run: sudo apt install -y --no-install-recommends sqlite3
       - name: Generate Release Info
         run: |
           last_build_number=$(git tag -l --sort=creatordate | grep -E '^[0-9]+$' | tail -n1);
@@ -40,6 +38,8 @@ jobs:
           mv public-db.sql public-db.mysql.sql
           go run concat.go -sqlite
           mv public-db.sql public-db.sqlite.sql
+          go run concat.go -update-only
+          mv public-db.sql public-db.update_only.sql
       - name: Test SQLite
         run: sqlite3 test.db < public-db.sqlite.sql
       - name: Test MySQL
@@ -49,17 +49,18 @@ jobs:
           DB_PASSWORD: 'root'
           DB_HOST: localhost
         run: |
-          sudo /etc/init.d/mysql start
+          sudo systemctl start mysql.service
           mysql -e 'CREATE DATABASE dol;' -uroot -proot
-          mysql -e 'SHOW DATABASES;' -uroot -proot
           cat public-db.mysql.sql | mysql -h 127.0.0.1 -u root -P 3306 --password=root -D dol
-      - name: Compress Queries
+          mysql -e 'USE dol; SHOW TABLES;' -uroot -proot
+      - name: Compress DB
         if: ${{ github.event_name == 'push' }}
         run: |
           mkdir build_artifacts
-          zip -Z bzip2 public-db.mysql.zip public-db.mysql.sql
-          zip -Z bzip2 public-db.sqlite.zip public-db.sqlite.sql
-          mv public-db.mysql.zip public-db.sqlite.zip build_artifacts
+          for export_type in mysql sqlite update_only; do \
+          zip -Z bzip2 "public.db.$export_type.zip" "public-db.$export_type.sql"; \
+          mv "public-db.$export_type.zip" build_artifacts; \
+          done
       - name: Create Release
         if: ${{ github.event_name == 'push' }}
         run: |
