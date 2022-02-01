@@ -36,7 +36,7 @@ jobs:
           cp config/config.example.yml config/config.yml
           
           for i in mysql sqlite update-only; \
-          do go run -export $i \
+          do go run . -export $i \
           && mv public-db.sql public-db.$i.sql; \
           done
       - name: Test SQLite
