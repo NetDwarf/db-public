@@ -15,14 +15,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          fetch-tags: true
       - name: Setup Build Environment
         uses: actions/setup-go@v4
         with:
           go-version: '1.21'
       - name: Generate Release Info
         run: |
-          set -eux
-          git fetch --tags origin
           last_build_number=$(git tag -l --sort=creatordate | grep -E '^[0-9]+$' | tail -n1);
           
           if [ -n "$last_build_number" ]; \
