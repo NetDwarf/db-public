@@ -23,6 +23,7 @@ jobs:
           go-version: '1.21'
       - name: Generate Release Info
         run: |
+          set -eux
           last_build_number=$(git tag -l --sort=creatordate | grep -E '^[0-9]+$' | tail -n1);
           
           if [ -n "$last_build_number" ]; \
