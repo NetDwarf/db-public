@@ -25,9 +25,9 @@ jobs:
       - name: Test SQLite
         run: |
           set -eux
+          printf 'db:\n    file_path: ./test.db' > config/config.yml
           cargo run -- --export sqlite
           sqlite3 test.db < public-db.sql
-          printf 'db:\n    file_path: ./test.db' > config/config.yml
           cargo run -- --import
           [[ -z "$(git diff)" ]]
       - name: Test Customization Queries
