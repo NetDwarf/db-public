@@ -20,6 +20,11 @@ impl Mysql {
             port,
             database,
         } = &credentials;
+        let host = if host == "localhost" {
+            "127.0.0.1"
+        } else {
+            host
+        }; // Fix Docker
         let connection_string = format!("mysql://{user}:{password}@{host}:{port}/{database}");
         let pool = Pool::new(connection_string.as_str()).unwrap();
         Self {
@@ -49,7 +54,7 @@ impl Mysql {
                 auto_increment: row.get(5) == Some("auto_increment".to_string()),
                 default_value: match row.get::<Option<String>, _>(4).unwrap() {
                     Some(s) => s,
-                    None => "NULL".to_string()
+                    None => "NULL".to_string(),
                 },
             };
             columns.push(col);
