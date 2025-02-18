@@ -7,7 +7,9 @@ const CONFIG_FILE_PATH: &str = "./config/config.yml";
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ConfigYml {
     pub db: DbCred,
+    #[serde(default)]
     pub include: Vec<String>,
+    #[serde(default)]
     pub exclude: Vec<String>,
     #[serde(default)]
     pub exportignore: Vec<String>,
