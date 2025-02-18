@@ -17,7 +17,7 @@ pub struct JsonDB {
 }
 
 impl JsonDB {
-    const DATA_FOLDER: &str = "../data/";
+    const DATA_FOLDER: &str = "./data/";
     const SCHEMAS_FILE_NAME: &str = "_TableSchemas.json";
     const STATIC_TABLES_LIST_FILE_NAME: &str = "_StaticTables.json";
 
@@ -78,7 +78,7 @@ impl JsonDB {
             "INSERT INTO `{}` ({}) VALUES \n",
             table_schema.name, columns
         );
-        let path = format!("../data/{}.json", table_schema.name);
+        let path = format!("{}{}.json", Self::DATA_FOLDER, table_schema.name);
         let data = match std::fs::read_to_string(&path) {
             Ok(s) => {
                 let json_value: Vec<Value> = serde_json::from_str(&s).unwrap();
@@ -87,12 +87,12 @@ impl JsonDB {
             Err(_) => {
                 let mut data_collection = Vec::<Value>::new();
                 let mut ctr = 0;
-                let mut path = format!("../data/{}.{}.json", table_schema.name, ctr);
+                let mut path = format!("{}{}.{}.json", Self::DATA_FOLDER, table_schema.name, ctr);
                 while let Ok(s) = std::fs::read_to_string(&path) {
                     let mut json_value: Vec<Value> = serde_json::from_str(&s).unwrap();
                     data_collection.append(&mut json_value);
                     ctr += 1;
-                    path = format!("../data/{}.{}.json", table_schema.name, ctr);
+                    path = format!("{}{}.{}.json", Self::DATA_FOLDER, table_schema.name, ctr);
                 }
                 data_collection
             }

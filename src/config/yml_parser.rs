@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use serde_yml;
 use std::fs;
 
-const CONFIG_FILE_PATH: &str = "../config/config.yml";
+const CONFIG_FILE_PATH: &str = "./config/config.yml";
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ConfigYml {
