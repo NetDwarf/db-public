@@ -19,6 +19,18 @@ jobs:
           fetch-depth: 0
       - name: Setup Build Environment
         uses: dtolnay/rust-toolchain@stable
+      - name: Set up cargo cache
+        uses: actions/cache@v4
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: cargo-
       - name: Generate Release Info
         run: |
           last_build_number=$(git tag -l --sort=creatordate | grep -E '^[0-9]+$' | tail -n1);
