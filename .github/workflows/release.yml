@@ -52,6 +52,7 @@ jobs:
           cargo build -r --target $LINUX_TARGET
           cargo build -r --target $WINDOWS_TARGET
           mv target/$LINUX_TARGET/release/${{ env.TOOL_NAME }} .
+          mv target/$WINDOWS_TARGET/release/${{ env.TOOL_NAME }}.exe .
       - name: Build Queries
         run: |
           for i in mysql sqlite; \
