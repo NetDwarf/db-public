@@ -54,14 +54,18 @@ jobs:
           LINUX_TARGET=x86_64-unknown-linux-gnu
           WINDOWS_TARGET=x86_64-pc-windows-gnu
           MACOS_TARGET=x86_64-apple-darwin
+          MACOS_ARM_TARGET=aarch64-apple-darwin
           rustup target add $WINDOWS_TARGET
           rustup target add $MACOS_TARGET
+          rustup target add $MACOS_ARM_TARGET
           cargo build -r --target $LINUX_TARGET
           cargo build -r --target $WINDOWS_TARGET
           LIBZ_SYS_STATIC=1 CC=o64-clang CXX=o64-clang++ cargo build -r --target $MACOS_TARGET
+          LIBZ_SYS_STATIC=1 CC=o64-clang CXX=o64-clang++ cargo build -r --target $MACOS_ARM_TARGET
           mv target/$LINUX_TARGET/release/${{ env.TOOL_NAME }} .
           mv target/$WINDOWS_TARGET/release/${{ env.TOOL_NAME }}.exe .
           mv target/$MACOS_TARGET/release/${{ env.TOOL_NAME }} ${{ env.TOOL_NAME }}_mac
+          mv target/$MACOS_ARM_TARGET/release/${{ env.TOOL_NAME }} ${{ env.TOOL_NAME }}_mac_aarch64
       - name: Build Queries
         run: |
           for i in mysql sqlite; \
