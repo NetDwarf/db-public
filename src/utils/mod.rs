@@ -23,7 +23,7 @@ pub fn download_database_from_github() {
     let releases: Vec<GithubRelease> = serde_json::from_str(&json_str).unwrap();
     for release in releases {
         for asset in release.assets {
-            let db_file_name = "public-db-tools.7z";
+            let db_file_name = "json_db.7z";
             if asset.name == db_file_name {
                 println!("Found {}", release.name);
                 let url = asset.browser_download_url;
